@@ -6,10 +6,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow),
     sql(new DLLMySql)
 {
-    ui->setupUi(this);
-    if (!sql->setup()) {
-        this->close();
-    }
+	ui->setupUi(this);
+	if (!sql->setup()) {
+		qDebug() << "Setup failed... exit with failure";
+		this->close();
+	}
 }
 
 MainWindow::~MainWindow()

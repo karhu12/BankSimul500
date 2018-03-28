@@ -1,7 +1,10 @@
 #include "dllmysql.h"
 
 
-DLLMySql::DLLMySql() : database(new Database), file(new File) {}
+DLLMySql::DLLMySql() :
+	database(new Database),
+	file(new File) {
+}
 
 DLLMySql::~DLLMySql() {
     delete database;
@@ -11,9 +14,15 @@ DLLMySql::~DLLMySql() {
 }
 
 bool DLLMySql::setup() {
-    file->readDatabaseConfig();
-    file->returnParameter("dbHostName");
-    file->returnParameter("dbName");
-    file->returnParameter("dbUserName");
-    file->returnParameter("dbPassword");
+	if (file->readDatabaseConfig() &&
+		database->setVariable("dbHost", file->returnCommandValue("dbHost")) &&
+		database->setVariable("dbUser", file->returnCommandValue("dbUser")) &&
+		database->setVariable("dbName", file->returnCommandValue("dbName")) &&
+		database->setVariable("dbPassword", file->returnCommandValue("dbPassword")) &&
+		database->connectToDatabase()) {
+		return true;
+	}
+	else {
+		return false;
+	}
 }

@@ -16,6 +16,9 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+signals:
+	finishProgram();
+
 private:
     Ui::MainWindow *ui;
     DLLMySql *sql;

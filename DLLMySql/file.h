@@ -5,11 +5,12 @@
 #include <QDebug>
 #include <QDir>
 #include <QString>
+#include <QRegExp>
 
 class File {
 public:
     bool readDatabaseConfig();
-    QString returnParameter(QString command);
+	QString returnCommandValue(QString command);
 
 private:
     QStringList commands, parameters;

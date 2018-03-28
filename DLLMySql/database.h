@@ -2,16 +2,15 @@
 #define DATABASE_H
 
 #include <QSqlDatabase>
+#include <QString>
+#include <QDebug>
 
 class Database {
 public:
-    Database();
-    ~Database();
     bool connectToDatabase();
-    bool isConnected() {
-        if (db.open()) return true;
-        else return false;
-    }
+	bool isConnected();
+	void closeConnection();
+	bool setVariable(QString variableName, QString value);
 
 private:
     QString dbHost, dbName, dbUser, dbPassword;
