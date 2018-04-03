@@ -5,8 +5,6 @@
 #-------------------------------------------------
 
 QT       += sql
-QT       += widgets
-QT       += gui
 
 TARGET = DLLMySql
 TEMPLATE = lib
@@ -27,13 +25,17 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         dllmysql.cpp \
     database.cpp \
-    file.cpp
+    file.cpp \
+    query.cpp \
+    session.cpp
 
 HEADERS += \
         dllmysql.h \
         dllmysql_global.h \  
     database.h \
-    file.h
+    file.h \
+    query.h \
+    session.h
 
 unix {
     target.path = /usr/lib

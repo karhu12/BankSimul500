@@ -9,6 +9,7 @@ bool Database::connectToDatabase() {
 	db.setPassword(dbPassword); //dbPassword
     if (db.open()) {
 		qDebug() << "Opened connection";
+		query = new QSqlQuery;
         return true;
     }
     else {
@@ -29,6 +30,8 @@ bool Database::isConnected() {
 
 //Closes database connection
 void Database::closeConnection() {
+	delete query;
+	query = nullptr;
 	db.close();
 }
 
