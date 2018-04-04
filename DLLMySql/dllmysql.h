@@ -16,8 +16,9 @@ public:
 	bool findAccountWithCardNumber(QString cardNumber);
 	bool confirmAccountPin(QString pinCode);
 	QString getAccountInformation(int fieldName);
-	void getLastTransactions(int amount);
-	QString getTransactionField(int fieldName, int latestTransaction);
+	int getLastTransactions();
+	//QString getTransactionField(int fieldName, int latestTransaction);
+	void createTransactionStrings(QString &dateString, QString &typeString, QString &recipientString, QString &sumString, int start, int end);
 
 private:
     Database *database;

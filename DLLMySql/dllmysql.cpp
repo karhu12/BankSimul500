@@ -33,9 +33,7 @@ bool DLLMySql::setup() {
 //Palauttaa True jos anetulla korttinumerolla on tili liitettynä
 bool DLLMySql::findAccountWithCardNumber(QString cardNumber) {
 	QStringList result = database->getCardFromNumber(cardNumber);
-	//If resulted query is not empty found an card with cardNumber and account
 	if (!result.empty()) {
-		//Save account_id and pin_code for later use
 		session->setAccountId(result.at(0).toInt());
 		session->setPinCode(result.at(1));
 		return true;
@@ -62,11 +60,33 @@ QString DLLMySql::getAccountInformation(int fieldName) {
 	return session->getFieldFromAccount(fieldName);
 }
 
-void DLLMySql::getLastTransactions(int amount) {
-	session->setTransactions(database->getAmountOfTransactions(amount, session->getAccountId()));
+//Palauttaa nykyisen kirjautuneen tilin tilitapahtumien määrän ja tallentaa ne paikalliseen sessio listaan
+//TÄYTYY KUTSUA ENNEN sql->getTransactionField():n KÄYTTÖÄ!!!
+//Voit hakea tilitapahtuman tietoja käyttämällä sql->getTransactionField() funktiota
+int DLLMySql::getLastTransactions() {
+	return session->setTransactions(database->getTransactions(session->getAccountId()));
 }
+
+/*Palauttaa QString tyyppisenä halutun tilitapahtuman tiedon
+*Voit hakea fieldNamen parametrinä jotain näistä: transaction_date, recipient, type, transaction_sum
+*latestTransaction parametri tarkoittaa kuinka uutta tilitapahtumaa haetaan. 0 uusin -> 1 yhden vahempi 2 -> vanhempi... jne...
+*tämän kanssa on avuliasta käyttää getLatestTransaction() funktion palauttamaa numeroa, että tietää paljonko tapahtumia on kokonaisuudessaan
 
 QString DLLMySql::getTransactionField(int fieldName, int latestTransaction) {
 	return session->getFieldFromTransaction(fieldName,latestTransaction);
-}
+} POIS KÄYTÖSTÄ */
 
+
+//Luo tilitapahtumia varten tehdyt QStringit. Sijoitetaan halutut stringit parametreiksi ja valitaan mistä kohtaa tilitapahtumia haetaan.
+//ESIM. createTransactionStrings(dateString,typeString,recipientString,sumString,0,9); hakisi uusimmat 10 tilitapahtumaa ja sijoittaisi ne haluttuihin stringeihin.
+void DLLMySql::createTransactionStrings(QString &dateString, QString &typeString, QString &recipientString, QString &sumString, int start, int end) {
+	dateString = ""; typeString = ""; recipientString = ""; sumString = "";
+	for (int i = start; i < end; ++i) {
+		if (session->getFieldFromTransaction(type,i) != "") {
+			dateString += session->getFieldFromTransaction(transaction_date,i) + "\n\n";
+			typeString += session->getFieldFromTransaction(type,i) + "\n\n";
+			recipientString += session->getFieldFromTransaction(recipient,i) + "\n\n";
+			sumString += session->getFieldFromTransaction(transaction_sum,i) + "€\n\n";
+		}
+	}
+}

@@ -19,9 +19,17 @@ public:
 signals:
 	finishProgram();
 
+private slots:
+	void on_pushButton_clicked();
+
+	void on_pushButton_2_clicked();
+
 private:
     Ui::MainWindow *ui;
     DLLMySql *sql;
+	int start, end;
+	int last;
+	QString s,t,r,x;
 };
 
 #endif // MAINWINDOW_H

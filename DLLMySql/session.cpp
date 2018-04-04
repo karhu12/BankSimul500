@@ -16,3 +16,8 @@ QString Session::getFieldFromTransaction(int fieldName, int latestTransaction) {
 	int i = (latestTransaction * 4) + fieldName;
 	return transactions.value(i);
 }
+
+int Session::setTransactions(QStringList list) {
+	transactions = list;
+	return transactions.size() / 4;
+}

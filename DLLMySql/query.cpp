@@ -30,14 +30,13 @@ QStringList Query::getAccountInformation(int accountId) {
 	return queryResult;
 }
 
-QStringList Query::getAmountOfTransactions(int amount, int accountId) {
+QStringList Query::getTransactions(int accountId) {
 	QStringList queryResult;
 	query->exec("SELECT transaction_date, recipient, type, transaction_sum "
 				"FROM Transaction WHERE account_id = " + QString::number(accountId) + " ORDER BY transaction_date DESC");
 
 	if (query->size() > 0) {
-		for (int i = 0; i < amount; ++i) {
-			query->next();
+		while (query->next()) {
 			queryResult.push_back(query->value(0).toString()); //transaction_date
 			queryResult.push_back(query->value(1).toString()); //recipient
 			queryResult.push_back(query->value(2).toString()); //type

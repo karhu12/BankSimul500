@@ -16,27 +16,41 @@ MainWindow::MainWindow(QWidget *parent) :
 		? "Account found with card number" : "Account not found with card number...");
 
 	qDebug() << ((sql->confirmAccountPin("1234")) ? "valid pin" : "Invalid pin");
-
-	/*QString str;
-	QStringList list = sql->getLastTransactions(4);
-	int i = 0;
-	while (i < list.size()) {
-		str += list.at(i) + "\n";
-		++i;
-	}
-	ui->label->setText(str);*/
-
-	sql->getLastTransactions(5);
-	for (int i = 0; i < 5; ++i) {
-		qDebug() << sql->getTransactionField(transaction_date,i);
-		qDebug() << sql->getTransactionField(type,i);
-		qDebug() << sql->getTransactionField(recipient,i);
-		qDebug() << sql->getTransactionField(transaction_sum,i);
-	}
+	last = sql->getLastTransactions();
+	start = 0; end = 9;
+	sql->createTransactionStrings(s,t,r,x,start,end);
+	ui->label->setText(s);
+	ui->label_2->setText(t);
+	ui->label_3->setText(r);
+	ui->label_4->setText(x);
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
     delete sql;
+}
+
+void MainWindow::on_pushButton_clicked()
+{
+	if (start + 10 < last) {
+		start += 10; end += 10;
+		sql->createTransactionStrings(s,t,r,x,start,end);
+		ui->label->setText(s);
+		ui->label_2->setText(t);
+		ui->label_3->setText(r);
+		ui->label_4->setText(x);
+	}
+}
+
+void MainWindow::on_pushButton_2_clicked()
+{
+	if (start - 10 >= 0) {
+		start -= 10; end -= 10;
+		sql->createTransactionStrings(s,t,r,x,start,end);
+		ui->label->setText(s);
+		ui->label_2->setText(t);
+		ui->label_3->setText(r);
+		ui->label_4->setText(x);
+	}
 }

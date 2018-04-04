@@ -8,7 +8,7 @@ class Query {
 public:
 	QStringList getCardFromNumber(QString cardNumber);
 	QStringList getAccountInformation(int accountId);
-	QStringList getAmountOfTransactions(int amount, int accountId);
+	QStringList getTransactions(int accountId);
 
 protected:
 	QSqlQuery *query;

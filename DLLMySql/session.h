@@ -15,7 +15,7 @@ public:
 	void setAccountId(int id) { accountId = id; }
 	void setPinCode(QString pin) { pinCode = pin; }
 	void setAccountInformation(QStringList list) { accountInformation = list; }
-	void setTransactions(QStringList list) { transactions = list; }
+	int setTransactions(QStringList list);
 	int getAccountId() { return accountId; }
 	QString getFieldFromAccount(int fieldName);
 	QString getFieldFromTransaction(int fieldName, int latestTransaction);
