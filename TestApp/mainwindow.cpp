@@ -16,6 +16,7 @@ MainWindow::MainWindow(QWidget *parent) :
 		? "Account found with card number" : "Account not found with card number...");
 
 	qDebug() << ((sql->confirmAccountPin("1234")) ? "valid pin" : "Invalid pin");
+
 	last = sql->getLastTransactions();
 	start = 0; end = 9;
 	sql->createTransactionStrings(s,t,r,x,start,end);
@@ -52,5 +53,27 @@ void MainWindow::on_pushButton_2_clicked()
 		ui->label_2->setText(t);
 		ui->label_3->setText(r);
 		ui->label_4->setText(x);
+	}
+}
+
+void MainWindow::on_pushButton_3_clicked()
+{
+	sql->chargePayment(100);
+	last = sql->getLastTransactions();
+	sql->createTransactionStrings(s,t,r,x,start,end);
+	ui->label->setText(s);
+	ui->label_2->setText(t);
+	ui->label_3->setText(r);
+	ui->label_4->setText(x);
+}
+
+void MainWindow::on_pushButton_4_clicked()
+{
+	if (sql->deactiveCard("0A0079E538")) {
+		qDebug() << "Deactivated card...";
+		this->close();
+	}
+	else {
+		qDebug() << "Failure deactivating card...";
 	}
 }

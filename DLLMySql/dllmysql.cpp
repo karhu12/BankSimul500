@@ -1,33 +1,43 @@
 #include "dllmysql.h"
 
-
-DLLMySql::DLLMySql() :
-	database(new Database),
-	file(new File),
-	session(new Session) {
-}
-
-DLLMySql::~DLLMySql() {
-    delete database;
-    delete file;
-	delete session;
-    database = nullptr;
-    file = nullptr;
-	session = nullptr;
-}
-
-//Start connection with the database true if succsefull
+//Lukee connection.cfg tiedoston josta haetaan tietokannan yhdistystiedot ja yhdistetään tietokantaan. Palauttaa true jos onnistui.
 bool DLLMySql::setup() {
+	database = new Database;
+	file = new File;
+	session = new Session;
 	if (file->readDatabaseConfig() &&
 		database->setVariable("dbHost", file->returnCommandValue("dbHost")) &&
 		database->setVariable("dbUser", file->returnCommandValue("dbUser")) &&
 		database->setVariable("dbName", file->returnCommandValue("dbName")) &&
 		database->setVariable("dbPassword", file->returnCommandValue("dbPassword")) &&
 		database->connectToDatabase()
-	)
-		return true;
-	else
+		) {
+			return true;
+	}
+	else {
+		delete database;
+		delete file;
+		delete session;
+		database = nullptr;
+		file = nullptr;
+		session = nullptr;
 		return false;
+	}
+}
+
+bool DLLMySql::disconnect() {
+	if (database->closeConnection()) {
+		delete database;
+		delete file;
+		delete session;
+		database = nullptr;
+		file = nullptr;
+		session = nullptr;
+		return true;
+	}
+	else {
+		return false;
+	}
 }
 
 //Palauttaa True jos anetulla korttinumerolla on tili liitettynä
@@ -67,14 +77,15 @@ int DLLMySql::getLastTransactions() {
 	return session->setTransactions(database->getTransactions(session->getAccountId()));
 }
 
-/*Palauttaa QString tyyppisenä halutun tilitapahtuman tiedon
-*Voit hakea fieldNamen parametrinä jotain näistä: transaction_date, recipient, type, transaction_sum
-*latestTransaction parametri tarkoittaa kuinka uutta tilitapahtumaa haetaan. 0 uusin -> 1 yhden vahempi 2 -> vanhempi... jne...
-*tämän kanssa on avuliasta käyttää getLatestTransaction() funktion palauttamaa numeroa, että tietää paljonko tapahtumia on kokonaisuudessaan
-
+//Palauttaa QString tyyppisenä halutun tilitapahtuman tiedon
+//Voit hakea fieldNamen parametrinä jotain näistä: transaction_date, recipient, type, transaction_sum
+//latestTransaction parametri tarkoittaa kuinka uutta tilitapahtumaa haetaan. 0 uusin -> 1 yhden vahempi 2 -> vanhempi... jne...
+//tämän kanssa on avuliasta käyttää getLatestTransaction() funktion palauttamaa numeroa, että tietää paljonko tapahtumia on kokonaisuudessaan
+/*
 QString DLLMySql::getTransactionField(int fieldName, int latestTransaction) {
 	return session->getFieldFromTransaction(fieldName,latestTransaction);
-} POIS KÄYTÖSTÄ */
+}
+POIS KÄYTÖSTÄ */
 
 
 //Luo tilitapahtumia varten tehdyt QStringit. Sijoitetaan halutut stringit parametreiksi ja valitaan mistä kohtaa tilitapahtumia haetaan.
@@ -89,4 +100,37 @@ void DLLMySql::createTransactionStrings(QString &dateString, QString &typeString
 			sumString += session->getFieldFromTransaction(transaction_sum,i) + "€\n\n";
 		}
 	}
+}
+
+bool DLLMySql::chargePayment(float sum) {
+	database->startTransaction();
+	if (session->isValidTransaction(QString::number(sum))) {
+		int total = session->getFieldFromAccount(balance).toInt() - sum;
+		if (database->setBalanceFromSum(total, session->getAccountId())) {
+			if (database->createTransactionFromSum(sum, session->getAccountId())) {
+				database->commitTransaction();
+				session->setAccountInformation(database->getAccountInformation(session->getAccountId()));
+				return true;
+			}
+			else {
+				qDebug() << "Tilitapahtuman luonti epäonnistui...";
+				database->rollbackTransaction();
+				return false;
+			}
+		}
+		else {
+			qDebug() << "Tilin saldon asetus epäonnistui...";
+			database->rollbackTransaction();
+			return false;
+		}
+	}
+	else {
+		qDebug() << "Summa oli liian suuri saldoon nähden...";
+		database->rollbackTransaction();
+		return false;
+	}
+}
+
+bool DLLMySql::deactiveCard(QString cardNumber) {
+	return database->removeCard(cardNumber);
 }

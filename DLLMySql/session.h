@@ -12,6 +12,7 @@ enum transactionEnums { transaction_date = 0, recipient = 1, type = 2, transacti
 class Session {
 public:
 	bool isAccountsPinCode(QString userInput);
+	bool isValidTransaction(QString sum);
 	void setAccountId(int id) { accountId = id; }
 	void setPinCode(QString pin) { pinCode = pin; }
 	void setAccountInformation(QStringList list) { accountInformation = list; }
@@ -19,6 +20,7 @@ public:
 	int getAccountId() { return accountId; }
 	QString getFieldFromAccount(int fieldName);
 	QString getFieldFromTransaction(int fieldName, int latestTransaction);
+
 
 private:
 	int accountId;

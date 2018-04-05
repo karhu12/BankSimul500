@@ -20,19 +20,18 @@ bool Database::connectToDatabase() {
 
 //Checks if database connection is open
 bool Database::isConnected() {
-	if (db.isOpen()) {
-		return true;
-	}
-	else {
-		return false;
-	}
+	return db.open();
 }
 
-//Closes database connection
-void Database::closeConnection() {
+//Sulkee yhteyden tietokantaan ja palauttaa true jos sulkeminen onnistui
+bool Database::closeConnection() {
 	delete query;
 	query = nullptr;
 	db.close();
+	if (isConnected())
+		return false;
+	else
+		return true;
 }
 
 //General setter for database QStrings. If variable exists update it with new value.
@@ -54,4 +53,16 @@ bool Database::setVariable(QString variableName, QString value) {
 		return false;
 	}
 	return true;
+}
+
+bool Database::startTransaction() {
+	return db.transaction();
+}
+
+bool Database::commitTransaction() {
+	return db.commit();
+}
+
+bool Database::rollbackTransaction() {
+	return db.rollback();
 }

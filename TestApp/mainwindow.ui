@@ -39,7 +39,7 @@
    <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
-      <x>240</x>
+      <x>330</x>
       <y>0</y>
       <width>101</width>
       <height>431</height>
@@ -61,7 +61,7 @@
    <widget class="QLabel" name="label_3">
     <property name="geometry">
      <rect>
-      <x>340</x>
+      <x>230</x>
       <y>0</y>
       <width>91</width>
       <height>431</height>
@@ -126,6 +126,32 @@
     </property>
     <property name="text">
      <string>NEXT</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_3">
+    <property name="geometry">
+     <rect>
+      <x>240</x>
+      <y>420</y>
+      <width>80</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>RAHAT VITTUU</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_4">
+    <property name="geometry">
+     <rect>
+      <x>449</x>
+      <y>10</y>
+      <width>131</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>KORTTI VITTUUN</string>
     </property>
    </widget>
   </widget>

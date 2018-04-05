@@ -13,10 +13,9 @@ QStringList Query::getCardFromNumber(QString cardNumber) {
 
 QStringList Query::getAccountInformation(int accountId) {
 	QStringList queryResult;
-	query->exec("SELECT account_number, firstname, surname, balance, address, post_number, phone_number "
+	query->exec("SELECT account_number, firstname, surname, cast(balance as signed), address, post_number, phone_number "
 				"FROM Account INNER JOIN Client ON Client.client_id = Account.client_id "
 				"WHERE account_id = " + QString::number(accountId) + ";");
-
 	if (query->size() > 0) {
 		query->first();
 		queryResult.push_back(query->value(0).toString()); //account_number
@@ -32,7 +31,7 @@ QStringList Query::getAccountInformation(int accountId) {
 
 QStringList Query::getTransactions(int accountId) {
 	QStringList queryResult;
-	query->exec("SELECT transaction_date, recipient, type, transaction_sum "
+	query->exec("SELECT DATE_FORMAT(transaction_date, '%d.%m'), recipient, type, transaction_sum "
 				"FROM Transaction WHERE account_id = " + QString::number(accountId) + " ORDER BY transaction_date DESC");
 
 	if (query->size() > 0) {
@@ -44,4 +43,18 @@ QStringList Query::getTransactions(int accountId) {
 		}
 	}
 	return queryResult;
+}
+
+bool Query::setBalanceFromSum(float sum, int accountId) {
+	return query->exec("UPDATE Account SET balance = " + QString::number(sum) + " where account_id = " + QString::number(accountId) + ";");
+}
+
+bool Query::createTransactionFromSum(float sum, int accountId) {
+	return query->exec("INSERT INTO Transaction (account_id, type, transaction_sum, recipient, transaction_date)"
+					   "VALUES(" + QString::number(accountId) + ", \"TILISIIRTO\", -" + QString::number(sum) + ", "
+					   "\"Pankki\", now());");
+}
+
+bool Query::removeCard(QString cardNumber) {
+	return query->exec("DELETE FROM Card where card_number = \"" + cardNumber + "\";");
 }
