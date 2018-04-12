@@ -2,12 +2,11 @@
 
 //Used to read connection.cfg in project directory to setup database info on startup
 bool File::readDatabaseConfig() {
-    QString command, parameter, data, path = QDir::currentPath();
-    path += "/connection.cfg";
-    QFile file(path);
+	QString command, parameter, data;
+	QDir path;
+	QFile file(path.absolutePath() + "/connection.cfg");
     if (!file.open(QIODevice::ReadOnly)) {
-        qDebug() << "Read failure";
-        qDebug() << path;
+		qDebug() << "Config file read failure...";
         return false;
     }
 	//read all commands and their parameters. Remove all escape characters and whitespaces from them
@@ -40,5 +39,5 @@ QString File::returnCommandValue(QString command) {
         }
     }
 	qDebug() << "Failure finding value for command";
-	return NULL;
+	return "";
 }

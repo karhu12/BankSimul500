@@ -1,15 +1,14 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2018-03-23T21:43:55
+# Project created by QtCreator 2018-04-09T09:41:07
 #
 #-------------------------------------------------
 
 QT       += core gui
-QT       += sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = TestApp
+TARGET = serviceTest
 TEMPLATE = app
 
 # The following define makes your compiler emit warnings if you use
@@ -34,27 +33,8 @@ HEADERS += \
 FORMS += \
         mainwindow.ui
 
-
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../build-DLLMySql-Desktop_Qt_5_10_0_MinGW_32bit-Debug/release/ -lDLLMySql
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../build-DLLMySql-Desktop_Qt_5_10_0_MinGW_32bit-Debug/debug/ -lDLLMySql
-
-INCLUDEPATH += $$PWD/../DLLMySql
-DEPENDPATH += $$PWD/../DLLMySql
-
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../build-ServiceFee-Desktop_Qt_5_10_0_MinGW_32bit-Debug/release/ -lServiceFee
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../build-ServiceFee-Desktop_Qt_5_10_0_MinGW_32bit-Debug/debug/ -lServiceFee
 
 INCLUDEPATH += $$PWD/../ServiceFee
 DEPENDPATH += $$PWD/../ServiceFee
-
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../build-DLLSerialPort-Desktop_Qt_5_10_0_MinGW_32bit-Debug/release/ -lDLLSerialPort
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../build-DLLSerialPort-Desktop_Qt_5_10_0_MinGW_32bit-Debug/debug/ -lDLLSerialPort
-
-INCLUDEPATH += $$PWD/../DLLSerialPort
-DEPENDPATH += $$PWD/../DLLSerialPort
-
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../build-DLLPinCode-Desktop_Qt_5_10_0_MinGW_32bit-Debug/release/ -lDLLPinCode
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../build-DLLPinCode-Desktop_Qt_5_10_0_MinGW_32bit-Debug/debug/ -lDLLPinCode
-
-INCLUDEPATH += $$PWD/../DLLPinCode
-DEPENDPATH += $$PWD/../DLLPinCode

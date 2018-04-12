@@ -5,26 +5,27 @@
 #include <QStringList>
 #include <QDebug>
 
-enum accountEnums { account_id = 0, firstname = 1, surname = 2, balance = 3, address = 4, post_number = 5, phone_number = 6 };
-enum transactionEnums { transaction_date = 0, recipient = 1, type = 2, transaction_sum = 3 };
-
+enum accountEnums { account_id = 0, firstname, surname, balance, address, post_number, phone_number };
+enum transactionEnums { transaction_date = 0, recipient, type, transaction_sum };
 
 class Session {
 public:
+	void setAccountInformation(QStringList list) { accountInformation = list; }
+	bool setSessionData(QStringList list, QString card);
+	int setTransactions(QStringList list);
+	int getAccountId() const { return accountId; }
+	QString getCardNumber() const { return cardNumber; }
 	bool isAccountsPinCode(QString userInput);
 	bool isValidTransaction(QString sum);
-	void setAccountId(int id) { accountId = id; }
-	void setPinCode(QString pin) { pinCode = pin; }
-	void setAccountInformation(QStringList list) { accountInformation = list; }
-	int setTransactions(QStringList list);
-	int getAccountId() { return accountId; }
-	QString getFieldFromAccount(int fieldName);
-	QString getFieldFromTransaction(int fieldName, int latestTransaction);
+	QString getFieldFromAccount(int fieldName) const;
+	QString getFieldFromTransaction(int fieldName, int latestTransaction) const;
+	void createTransactionStrings(QString &dateStr, QString &typeStr, QString &recipientStr, QString &sumStr, int page);
+	void createTransactionStrings(QString &dateStr, QString &typeStr, QString &recipientStr, QString &sumStr, int start, int end);
 
 
 private:
 	int accountId;
-	QString pinCode;
+	QString pinCode, cardNumber;
 	QStringList accountInformation;
 	QStringList transactions;
 };

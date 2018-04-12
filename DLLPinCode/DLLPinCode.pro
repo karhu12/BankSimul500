@@ -1,15 +1,15 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2018-03-23T17:46:24
+# Project created by QtCreator 2018-04-10T09:42:43
 #
 #-------------------------------------------------
 
-QT       += sql
+QT       += widgets
 
-TARGET = DLLMySql
+TARGET = DLLPinCode
 TEMPLATE = lib
 
-DEFINES += DLLMYSQL_LIBRARY
+DEFINES += DLLPINCODE_LIBRARY
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings
@@ -23,19 +23,18 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-        dllmysql.cpp \
-    database.cpp \
-    file.cpp \
-    session.cpp
+        dllpincode.cpp \
+    uiengine.cpp
 
 HEADERS += \
-        dllmysql.h \
-        dllmysql_global.h \  
-    database.h \
-    file.h \
-    session.h
+        dllpincode.h \
+        dllpincode_global.h \  
+    uiengine.h
 
 unix {
     target.path = /usr/lib
     INSTALLS += target
 }
+
+FORMS += \
+    uiengine.ui
