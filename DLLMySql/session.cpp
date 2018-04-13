@@ -1,5 +1,9 @@
 #include "session.h"
 
+int Session::accountId;
+QString Session::pinCode, Session::cardNumber;
+QStringList Session::accountInformation, Session::transactions;
+
 //Palauttaa true jos parametri pin koodi on sama kuin kortin oma pin koodi
 bool Session::isAccountsPinCode(QString userInput) {
 	if (userInput == pinCode)

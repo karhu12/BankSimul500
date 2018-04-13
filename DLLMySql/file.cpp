@@ -23,8 +23,7 @@ bool File::readDatabaseConfig() {
 			parameter.remove(QRegExp("[\\r\\n]"));
 			//Store them in QStringLists
             commands.push_back(command);
-            parameters.push_back(parameter);
-			qDebug() << "Cmd: " << command << " Parameter: " << parameter;
+			parameters.push_back(parameter);
 		}
     }
 	qDebug() << "Finished reading config file...";

@@ -22,9 +22,10 @@ public:
 
 
 private:
-    QString dbHost, dbName, dbUser, dbPassword;
-	QSqlDatabase db;
-	QSqlQuery *query;
+	static bool connected;
+	static QString dbHost, dbName, dbUser, dbPassword;
+	static QSqlDatabase db;
+	static QSqlQuery query;
 	bool setBalanceFromSum(float sum, int accountId);
 	bool createTransactionFromSum(float sum, int accountId, char type);
 };

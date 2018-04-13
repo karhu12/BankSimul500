@@ -67,7 +67,13 @@ void MainWindow::on_pushButton_4_clicked()
 {
 	if (sql->lockCurrentCard()) {
 		qDebug() << "Deactivated card...";
-		this->close();
+		serviceFee->stopServiceFee();
+		sql->disconnect();
+		connect(serial, SIGNAL(passID(QString)), this, SLOT(handleSerial(QString)));
+		ui->label->setText("");
+		ui->label_2->setText("");
+		ui->label_3->setText("");
+		ui->label_4->setText("");
 	}
 	else {
 		qDebug() << "Failure deactivating card...";
@@ -134,5 +140,10 @@ void MainWindow::on_pushButton_5_clicked()
 		qDebug() << "Gain: " << totalServiceFee << "Cash";
 	}
 	serviceFee->stopServiceFee();
-	close();
+	sql->disconnect();
+	connect(serial, SIGNAL(passID(QString)), this, SLOT(handleSerial(QString)));
+	ui->label->setText("");
+	ui->label_2->setText("");
+	ui->label_3->setText("");
+	ui->label_4->setText("");
 }

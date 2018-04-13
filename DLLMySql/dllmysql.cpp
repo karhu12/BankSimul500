@@ -47,6 +47,7 @@ void DLLMySql::disconnect() {
 }
 
 //Palauttaa True jos anetulla korttinumerolla on tili liitettynä
+//Täytyy kutsua onnistuneesti ennen kuin voidaan käyttää muita sql kyselyitä, koska funktio asettaa session käyttäjän!
 bool DLLMySql::findAccountWithCardNumber(QString cardNumber) {
 	return session->setSessionData(database->getCardFromNumber(cardNumber), cardNumber);
 }
@@ -59,7 +60,6 @@ bool DLLMySql::isCardLocked() {
 //Palauttaa True jos pin koodi on sama kuin kortille liitetty pin koodi
 bool DLLMySql::confirmAccountPin(QString pinCode) {
 	if (session->isAccountsPinCode(pinCode)) {
-		session->setAccountInformation(database->getAccountInformation(session->getAccountId()));
 		return true;
 	}
 	else {
@@ -71,6 +71,7 @@ bool DLLMySql::confirmAccountPin(QString pinCode) {
 //account_id, firstname, surname, balance, address, post_number, phone_number
 //esim. sql->getAccountInformation(surname);
 QString DLLMySql::getAccountInformation(int fieldName) {
+	session->setAccountInformation(database->getAccountInformation(session->getAccountId()));
 	return session->getFieldFromAccount(fieldName);
 }
 

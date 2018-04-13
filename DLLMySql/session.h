@@ -24,10 +24,9 @@ public:
 
 
 private:
-	int accountId;
-	QString pinCode, cardNumber;
-	QStringList accountInformation;
-	QStringList transactions;
+	static int accountId;
+	static QString pinCode, cardNumber;
+	static QStringList accountInformation, transactions;
 };
 
 #endif // SESSION_H
