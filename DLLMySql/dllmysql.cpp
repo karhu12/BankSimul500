@@ -2,16 +2,13 @@
 
 DLLMySql::DLLMySql() {
 	database = new Database;
-	file = new File;
 	session = new Session;
 }
 
 DLLMySql::~DLLMySql() {
 	delete database;
-	delete file;
 	delete session;
 	database = nullptr;
-	file = nullptr;
 	session = nullptr;
 }
 
@@ -19,11 +16,14 @@ DLLMySql::~DLLMySql() {
 //Jos tiedostoa ei voida lukea käytetään yhdistykseen perusparametrejä.
 //Palauttaa true jos yhteys aukesi.
 bool DLLMySql::setup() {
+	file = new File;
 	if (file->readDatabaseConfig()) {
 		database->setVariable("dbHost", file->returnCommandValue("dbHost"));
 		database->setVariable("dbUser", file->returnCommandValue("dbUser"));
 		database->setVariable("dbName", file->returnCommandValue("dbName"));
 		database->setVariable("dbPassword", file->returnCommandValue("dbPassword"));
+		delete file;
+		file = nullptr;
 		if (database->connectToDatabase()) {
 			return true;
 		}
@@ -32,6 +32,8 @@ bool DLLMySql::setup() {
 		}
 	}
 	else {
+		delete file;
+		file = nullptr;
 		if (database->connectToDatabaseDefault()) {
 			return true;
 		}
@@ -49,7 +51,9 @@ void DLLMySql::disconnect() {
 //Palauttaa True jos anetulla korttinumerolla on tili liitettynä
 //Täytyy kutsua onnistuneesti ennen kuin voidaan käyttää muita sql kyselyitä, koska funktio asettaa session käyttäjän!
 bool DLLMySql::findAccountWithCardNumber(QString cardNumber) {
-	return session->setSessionData(database->getCardFromNumber(cardNumber), cardNumber);
+    bool ret = session->setSessionData(database->getCardFromNumber(cardNumber), cardNumber);
+    session->setAccountInformation(database->getAccountInformation(session->getAccountId()));
+    return ret;
 }
 
 //Palauttaa true jos nykyinen kortti on lukittu
@@ -75,21 +79,20 @@ QString DLLMySql::getAccountInformation(int fieldName) {
 	return session->getFieldFromAccount(fieldName);
 }
 
-//Palauttaa nykyisen kirjautuneen tilin tilitapahtumien määrän ja tallentaa ne paikalliseen sessio listaan
-//TÄYTYY KUTSUA ENNEN sql->getTransactionField():n KÄYTTÖÄ!!!
-//Voit hakea tilitapahtuman tietoja käyttämällä sql->getTransactionField() funktiota
+//Palauttaa nykyisen kirjautuneen tilin tilitapahtumien määrän ja tallentaa ne staattiseen sessio listaan
+//TÄYTYY KUTSUA ENNEN sql->createTransactionStrings():n KÄYTTÖÄ!!!
 int DLLMySql::getLastTransactions() {
 	return session->setTransactions(database->getTransactions(session->getAccountId()));
 }
 
 //Luo tilitapahtumia varten tehdyt QStringit. Sijoitetaan halutut stringit parametreiksi ja valitaan mistä kohtaa tilitapahtumia haetaan.
 //ESIM. createTransactionStrings(dateString,typeString,recipientString,sumString,0,9); hakisi uusimmat 10 tilitapahtumaa ja sijoittaisi ne haluttuihin stringeihin.
-//Tarkistuksen voisi tehdä esim. int start = 0, end = 0; int transAmount = getLastTransactions(); if (start + 10 < transAmount) { start += 10; end += 10; suorita; }
+//Tarkistuksen voisi tehdä esim. int start = 0, end = 9; int transAmount = getLastTransactions(); if (start + 10 < transAmount) { start += 10; end += 10; suorita; }
 void DLLMySql::createTransactionStrings(QString &dateString, QString &typeString, QString &recipientString, QString &sumString, int start, int end) {
 	session->createTransactionStrings(dateString, typeString, recipientString, sumString, start, end);
 }
 
-//overloaded versio aiemmasta. Tekee tilitapahtumat ns. sivun mukaan. sivu 0 (uusin) antaa 10 viimeisintä tilitapahtumaa ja sivu 1 10 vanhempaa ja jne...
+//overloaded versio aiemmasta. Tekee tilitapahtumat ns. sivun mukaan. sivu 0 (uusin) antaa 10 viimeisintä tilitapahtumaa ja sivu 1 -> 10 vanhempaa ja jne...
 //Ylimeno tarkistuksen voi tehdä käyttäen getLastTransactionsin palautusarvoa jaettuna kymmenellä
 //esim. int page = 0; int transAmount = getLastTransactions(); if (page + 1 < transAmount / 10) { ++page;
 //createTransactionStrings(date, type, recipient, sum, page) }
@@ -99,9 +102,9 @@ void DLLMySql::createTransactionStrings(QString &dateString, QString &typeString
 
 //Tarkistaa onko haluttu summa sallittu poistaa nykyiseltä tililtä ja velottaa sen sekä luo siitä tilitapahtuman
 //Palautusarvoina 0 tarkoittaa onnistumista, 1 tarkoittaa että maksu oli liian suuri  ja 2 tarkoittaa että maksussa tapahtui virhe
-int DLLMySql::chargePayment(float sum) {
+int DLLMySql::chargePayment(float sum, QString transType, QString receiver) {
 	if (session->isValidTransaction(QString::number(sum))) {
-		if (database->chargePayment(sum, session->getFieldFromAccount(balance).toFloat(), session->getAccountId())) {
+        if (database->chargePayment(sum, session->getFieldFromAccount(balance).toFloat(), session->getAccountId(), transType, receiver)) {
 			session->setAccountInformation(database->getAccountInformation(session->getAccountId()));
 			return 0;
 		}
@@ -114,9 +117,10 @@ int DLLMySql::chargePayment(float sum) {
 	}
 }
 
-//Lisää tilille summan verran rahaa ja luo siitä tilitapahtuman. Palauttaa true jos onnistui ongelmitta.
-bool DLLMySql::receivePayment(float sum) {
-	if (database->receivePayment(sum, session->getFieldFromAccount(balance).toFloat(), session->getAccountId())) {
+//Lisää tilille summan verran rahaa ja luo siitä tilitapahtuman. Palauttaa true jos onnistui ongelmitta. Tilitapahtumaan tahdottu tyyppi stringinä
+//Tilitapahtumaan tahdottu tyyppi stringinä
+bool DLLMySql::receivePayment(float sum, QString transType, QString receiver) {
+    if (database->receivePayment(sum, session->getFieldFromAccount(balance).toFloat(), session->getAccountId(), transType, receiver)) {
 		session->setAccountInformation(database->getAccountInformation(session->getAccountId()));
 		return true;
 	}

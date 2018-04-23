@@ -11,13 +11,12 @@ public:
 	void startServiceFee();
 	bool stopServiceFee();
 	bool isFeeOverBalance(double balance);
-	bool isOverFeeLevel();
 
 
 signals:
 	passServiceFee(unsigned int duration, double fee);
 
-public slots:
+private slots:
 	void handleTimerSignal(unsigned int duration, double fee);
 
 private:

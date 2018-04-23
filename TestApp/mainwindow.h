@@ -38,7 +38,7 @@ private:
 	ServiceFee *serviceFee;
 	DLLSerialPort *serial;
 	DLLPinCode *pin;
-	int start, end;
+	int start, end, page;
 	int last;
 	double totalServiceFee;
 	unsigned totalServiceTime;

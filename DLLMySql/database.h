@@ -17,8 +17,8 @@ public:
 	QStringList getTransactions(int accountId);
 	bool getCardLockedState(QString cardNumber);
 	bool lockCard(QString cardNumber);
-	bool chargePayment(float sum, float balance, int accountId);
-	bool receivePayment(float sum, float balance, int accountId);
+    bool chargePayment(float sum, float balance, int accountId, QString type, QString receiver);
+    bool receivePayment(float sum, float balance, int accountId, QString type, QString receiver);
 
 
 private:
@@ -27,7 +27,7 @@ private:
 	static QSqlDatabase db;
 	static QSqlQuery query;
 	bool setBalanceFromSum(float sum, int accountId);
-	bool createTransactionFromSum(float sum, int accountId, char type);
+    bool createTransactionFromSum(float sum, int accountId, char type, QString transType, QString receiver);
 };
 
 //QSqlDatabase Database::db;

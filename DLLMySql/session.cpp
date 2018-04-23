@@ -30,13 +30,13 @@ int Session::setTransactions(QStringList list) {
 }
 
 bool Session::isValidTransaction(QString sum) {
-	if (getFieldFromAccount(balance).toFloat() - sum.toFloat() >= 0) {
-		return true;
-	}
-	else {
-		qDebug() << "Summa oli liian suuri saldoon nähden...";
-		return false;
-	}
+    if (accountInformation.size() > 0) {
+        if (getFieldFromAccount(balance).toFloat() - sum.toFloat() >= 0)
+            return true;
+        else
+            return false;
+    }
+    return false;
 }
 
 bool Session::setSessionData(QStringList list, QString card) {
@@ -53,7 +53,7 @@ bool Session::setSessionData(QStringList list, QString card) {
 
 void Session::createTransactionStrings(QString &dateStr, QString &typeStr, QString &recipientStr, QString &sumStr, int start, int end) {
 	dateStr = ""; typeStr = ""; recipientStr = ""; sumStr = "";
-	for (int i = start; i < end; ++i) {
+	for (int i = start; i <= end; ++i) {
 		if (getFieldFromTransaction(type,i) != "") {
 			dateStr += getFieldFromTransaction(transaction_date,i) + "\n\n";
 			typeStr += getFieldFromTransaction(type,i) + "\n\n";
@@ -65,8 +65,8 @@ void Session::createTransactionStrings(QString &dateStr, QString &typeStr, QStri
 
 void Session::createTransactionStrings(QString &dateStr, QString &typeStr, QString &recipientStr, QString &sumStr, int page) {
 	dateStr = ""; typeStr = ""; recipientStr = ""; sumStr = "";
-	int start = 0 + (1 * page), end = 10 + (1 * page);
-	for (int i = start; i < end; ++i) {
+	int start = 0 + (page * 10), end = 9 + (page * 10);
+	for (int i = start; i <= end; ++i) {
 		if (getFieldFromTransaction(type,i) != "") {
 			dateStr += getFieldFromTransaction(transaction_date,i) + "\n\n";
 			typeStr += getFieldFromTransaction(type,i) + "\n\n";

@@ -36,7 +36,7 @@ void MainWindow::on_pushButton_2_clicked()
 {
 	if (start - 10 >= 0) {
 		start -= 10; end -= 10;
-		sql->createTransactionStrings(s,t,r,x,start,end);
+		sql->createTransactionStrings(s,t,r,x,page);
 		ui->label->setText(s);
 		ui->label_2->setText(t);
 		ui->label_3->setText(r);
@@ -49,7 +49,7 @@ void MainWindow::on_pushButton_3_clicked()
 	int payment = sql->chargePayment(100);
 	if (payment == 0) {
 		last = sql->getLastTransactions();
-		sql->createTransactionStrings(s,t,r,x,start,end);
+		sql->createTransactionStrings(s,t,r,x,page);
 		ui->label->setText(s);
 		ui->label_2->setText(t);
 		ui->label_3->setText(r);
@@ -131,7 +131,7 @@ void MainWindow::handleSerial(QString cardNumber) {
 
 void MainWindow::on_pushButton_5_clicked()
 {
-	if (serviceFee->isOverFeeLevel()) {
+	if (serviceFee->stopServiceFee()) {
 		sql->chargePayment(totalServiceFee);
 		qDebug() << "Lose: " << totalServiceFee << "Cash";
 	}
@@ -139,7 +139,6 @@ void MainWindow::on_pushButton_5_clicked()
 		sql->receivePayment(totalServiceFee);
 		qDebug() << "Gain: " << totalServiceFee << "Cash";
 	}
-	serviceFee->stopServiceFee();
 	sql->disconnect();
 	connect(serial, SIGNAL(passID(QString)), this, SLOT(handleSerial(QString)));
 	ui->label->setText("");

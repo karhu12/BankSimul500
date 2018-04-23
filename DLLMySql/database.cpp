@@ -97,11 +97,11 @@ bool Database::setVariable(QString variableName, QString value) {
 }
 
 //Aloittaa tietokanta transactionin ja yrittää päivittää tilin saldon ja luoda tilitapahtuman. Jos menee läpi tietokannalle tehdään commit ja palautetaan true.
-//Muuten tietokanta rollback ja palautetaan false.
-bool Database::chargePayment(float sum, float balance, int accountId) {
+//Muuten tietokanta rollback ja palautetaan false. QStringi parametrinä asettaa transactioniin halutun nimen
+bool Database::chargePayment(float sum, float balance, int accountId, QString type, QString receiver) {
 	db.transaction();
 	if (setBalanceFromSum(balance - sum, accountId)) {
-		if (createTransactionFromSum(sum, accountId, '-')) {
+        if (createTransactionFromSum(sum, accountId, '-', type, receiver)) {
 			db.commit();
 			return true;
 		}
@@ -119,22 +119,27 @@ bool Database::chargePayment(float sum, float balance, int accountId) {
 }
 
 //Toimii kuin ylempi funktio, mutta veloittamisen sijasta rahaa tulee tilille.
-bool Database::receivePayment(float sum, float balance, int accountId) {
-	db.transaction();
-	if (setBalanceFromSum(sum + balance, accountId)) {
-		if (createTransactionFromSum(sum, accountId, '+')) {
-			db.commit();
-			return true;
+bool Database::receivePayment(float sum, float balance, int accountId, QString type, QString receiver) {
+	if (sum != 0) {
+		db.transaction();
+		if (setBalanceFromSum(sum + balance, accountId)) {
+            if (createTransactionFromSum(sum, accountId, '+', type, receiver)) {
+				db.commit();
+				return true;
+			}
+			else {
+				qDebug() << "Tilitapahtuman luonti epäonnistui...";
+				db.rollback();
+				return false;
+			}
 		}
 		else {
-			qDebug() << "Tilitapahtuman luonti epäonnistui...";
+			qDebug() << "Tilin saldo asetus epäonnistui...";
 			db.rollback();
 			return false;
 		}
 	}
 	else {
-		qDebug() << "Tilin saldo asetus epäonnistui...";
-		db.rollback();
 		return false;
 	}
 }
@@ -208,11 +213,15 @@ bool Database::setBalanceFromSum(float sum, int accountId) {
 	return query.exec();
 }
 
-//Luo tilitapahtuman halutusta tilistä Perustyypillä: saaja - Pankki, tyyppi - TILISIIRTO ja parametrinä pano(+) vai nosto(-)
-bool Database::createTransactionFromSum(float sum, int accountId, char type) {
-	return query.exec("INSERT INTO Transaction (account_id, type, transaction_sum, recipient, transaction_date)"
-					   "VALUES(" + QString::number(accountId) + ", \"TILISIIRTO\", " + (type == '+' ? "+" : "-") + QString::number(sum) + ", "
-					   "\"Pankki\", now());");
+
+//Luo tilitapahtuman halutusta tilistä Perustyypillä: saaja - Pankki, tyyppi - transType ja parametrinä pano(+) vai nosto(-)
+bool Database::createTransactionFromSum(float sum, int accountId, char type, QString transType, QString receiver) {
+    if (sum > 0) {
+        return query.exec("INSERT INTO Transaction (account_id, type, transaction_sum, recipient, transaction_date)"
+                           "VALUES(" + QString::number(accountId) + ", \"" + transType + "\", " + (type == '+' ? "+" : "-") + QString::number(sum) + ", "
+                           "\"" + receiver + "\", now());");
+    }
+    return true;
 }
 
 //Poistaa halutun kortin tietokannasta tilinumeron perusteella

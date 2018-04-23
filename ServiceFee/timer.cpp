@@ -6,10 +6,11 @@ Timer::Timer() {
 	connect(timer, SIGNAL(timeout()), this, SLOT(timeoutHandle()));
 	totalFee = 20;
 	duration = 0;
+	qDebug() << "Service fee started";
 }
 
 Timer::~Timer() {
-	timer->stop();
+	disconnect(timer);
 	delete timer;
 	timer = nullptr;
 }
@@ -45,8 +46,8 @@ bool Timer::isFeeOverBalance(double balance) {
 }
 
 bool Timer::isOverFeeLevel() {
-	if (duration <= 20)
-		return false;
-	else
+	if (duration  > 20)
 		return true;
+	else
+		return false;
 }
