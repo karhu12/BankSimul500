@@ -182,7 +182,7 @@ QStringList Database::getAccountInformation(int accountId) {
 //Hakee kaikki halutun tilin tilitapahtumat ja palauttaa ne
 QStringList Database::getTransactions(int accountId) {
 	QStringList queryResult;
-	query.prepare("SELECT DATE_FORMAT(transaction_date, '%d.%m'), recipient, type, transaction_sum "
+	query.prepare("SELECT DATE_FORMAT(transaction_date, '%d.%m.'), recipient, type, transaction_sum "
 				"FROM Transaction WHERE account_id = ? ORDER BY transaction_date DESC");
 	query.addBindValue(accountId);
 	query.exec();
